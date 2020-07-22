@@ -2,6 +2,14 @@
 
 import sys
 
+instructions = {
+    0b00000000: '???',
+    0b00000001: 'HLT',
+    0b00000010: 'LDI',
+    0b00000111: 'PRN'
+}
+
+
 class CPU:
     """Main CPU class."""
     
@@ -125,4 +133,25 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while True:
+            # Read the memory address that's stored in register PC, and store that result in the Instruction Register.
+            self.pc = self.ir
+
+            cmd = instructions[self.ir & 0x3F]
+
+            if cmd == 'HLT':
+                return 
+            elif cmd == 'LDI':
+                ldi()
+            elif cmd == 'PRN':
+                prn()
+            else:
+                print(f"Unsupported instruction: {cmd}")
+                return 
+
+    def ldi:
+        return
+
+    def prn:
+        return 
+        
