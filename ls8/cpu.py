@@ -135,23 +135,30 @@ class CPU:
         """Run the CPU."""
         while True:
             # Read the memory address that's stored in register PC, and store that result in the Instruction Register.
-            self.pc = self.ir
+            self.ir = self.pc
 
-            cmd = instructions[self.ir & 0x3F]
+            cmd = instructions[self.ram_read(self.ir) & 0x3F]
 
             if cmd == 'HLT':
                 return 
             elif cmd == 'LDI':
-                ldi()
+                self.ldi()
             elif cmd == 'PRN':
-                prn()
+                self.prn()
             else:
                 print(f"Unsupported instruction: {cmd}")
                 return 
 
-    def ldi:
+            # Advance PC by the highest two order bits
+            self.pc = self.pc + (self.ram_read(self.pc) >> 6)
+
+    def ldi(self):
+        register = self.ram_read(self.pc + 1) & 0x07
+        self.ram_write(register, self.pc + 2)
         return
 
-    def prn:
+    def prn(self):
+        register = self.ram_read(self.pc + 1) & 0x07
+        print(register)
         return 
         
