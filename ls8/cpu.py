@@ -16,7 +16,7 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 0xFF  # x is a list of 25 zeroes
-        self.registers = [0] 0x0F
+        self.registers = [0] * 0x0F
         self.pc = 0     # Program Counter, address of the currently executing instruction
         self.ir = 0     # Instruction Register, contains a copy of the currently executing instruction
         self.mar = 0    # Memory Address Register, holds the memory address we're reading or writing
@@ -138,7 +138,7 @@ class CPU:
             # Read the memory address that's stored in register PC, and store that result in the Instruction Register.
             self.ir = self.pc
 
-            cmd = instructions[self.ram_read(self.ir) & 0x3F]
+            cmd = instructions[self.ram_read(self.pc) & 0x3F]
 
             if cmd == 'HLT':
                 return 
@@ -151,15 +151,13 @@ class CPU:
                 return 
 
             # Advance PC by the highest two order bits
-            self.pc = self.pc + (self.ram_read(self.pc) >> 6)
+            self.pc = self.pc + (self.ram_read(self.pc) >> 6) + 1
 
     def ldi(self):
-        register = self.ram_read(self.pc + 1) & 0x07
-        self.ram_write(register, self.pc + 2)
+        self.registers[self.ram_read(self.pc + 1) & 0x07] = self.ram_read(self.pc + 2)
         return
 
     def prn(self):
-        register = self.ram_read(self.pc + 1) & 0x07
-        print(register)
+        print(self.registers[self.ram_read(self.pc + 1) & 0x07])
         return 
         
