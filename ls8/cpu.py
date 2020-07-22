@@ -16,6 +16,7 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 0xFF  # x is a list of 25 zeroes
+        self.registers = [0] 0x0F
         self.pc = 0     # Program Counter, address of the currently executing instruction
         self.ir = 0     # Instruction Register, contains a copy of the currently executing instruction
         self.mar = 0    # Memory Address Register, holds the memory address we're reading or writing
@@ -25,54 +26,54 @@ class CPU:
     # Register getter methods
     @property
     def r0(self):
-        return self.ram[0]
+        return self.registers[0]
     @property
     def r1(self):
-        return self.ram[1]
+        return self.registers[1]
     @property
     def r2(self):
-        return self.ram[2]
+        return self.registers[2]
     @property
     def r3(self):
-        return self.ram[3]
+        return self.registers[3]
     @property
     def r4(self):
-        return self.ram[4]
+        return self.registers[4]
     @property
     def r5(self):
-        return self.ram[5]
+        return self.registers[5]
     @property
     def r6(self):
-        return self.ram[6]
+        return self.registers[6]
     @property
     def r7(self):
-        return self.ram[7]
+        return self.registers[7]
 
     # Register setter methods
     @r0.setter
     def r0(self, value):
-        self.ram[0] = value
+        self.registers[0] = value
     @r1.setter
     def r1(self, value):
-        self.ram[1] = value
+        self.registers[1] = value
     @r2.setter
     def r2(self, value):
-        self.ram[2] = value
+        self.registers[2] = value
     @r3.setter
     def r3(self, value):
-        self.ram[3] = value
+        self.registers[3] = value
     @r4.setter
     def r4(self, value):
-        self.ram[4] = value
+        self.registers[4] = value
     @r5.setter
     def r5(self, value):
-        self.ram[5] = value
+        self.registers[5] = value
     @r6.setter
     def r6(self, value):
-        self.ram[6] = value
+        self.registers[6] = value
     @r7.setter
     def r7(self, value):
-        self.ram[7] = value
+        self.registers[7] = value
 
     def ram_read(self, mar):
         return self.ram[mar]
