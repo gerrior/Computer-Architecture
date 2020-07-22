@@ -14,10 +14,6 @@ class CPU:
         self.mdr = 0    # Memory Data Register, holds the value to write or the value just read
         self.fl = 0     # Flags, see below
 
-        print(self.r7)
-        self.r7 = 0xF4
-        print(self.r7)
-
     # Register getter methods
     @property
     def r0(self):
@@ -69,6 +65,12 @@ class CPU:
     @r7.setter
     def r7(self, value):
         self.ram[7] = value
+
+    def ram_read(self, mar):
+        return self.ram[mar]
+    
+    def ram_write(self, mar, mdr):
+        self.ram[mar] = mdr
 
     def load(self):
         """Load a program into memory."""
