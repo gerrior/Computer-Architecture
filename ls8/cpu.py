@@ -6,7 +6,8 @@ instructions = {
     0b00000000: '???',
     0b00000001: 'HLT',
     0b00000010: 'LDI',
-    0b00000111: 'PRN'
+    0b00000111: 'PRN',
+    0b00100010: 'MUL'
 }
 
 
@@ -93,7 +94,7 @@ class CPU:
 
         try:
             filename = sys.argv[1] # This will throw if there is no second argument
-            #filename = "examples/empty.ls8"
+            # filename = "examples/mult.ls8"
 
             file = open(filename, "r")
             for line in file:
@@ -171,6 +172,8 @@ class CPU:
                 self.ldi()
             elif cmd == 'PRN':
                 self.prn()
+            elif cmd == 'MUL':
+                self.mul()
             else:
                 print(f"Unsupported instruction: {cmd}")
                 return 
@@ -186,3 +189,7 @@ class CPU:
         print(self.registers[self.ram_read(self.pc + 1) & 0x07])
         return 
         
+    def mul(self):
+        self.r0 = self.r0 * self.r1
+        return
+
