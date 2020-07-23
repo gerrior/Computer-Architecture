@@ -3,11 +3,11 @@
 import sys
 
 instructions = {
-    0b00000000: '???',
-    0b00000001: 'HLT',
-    0b00000010: 'LDI',
-    0b00000111: 'PRN',
-    0b00100010: 'MUL'
+    '???': 0b00000000,
+    'HLT': 0b00000001,
+    'LDI': 0b00000010,
+    'PRN': 0b00000111,
+    'MUL': 0b00100010
 }
 
 
@@ -23,6 +23,12 @@ class CPU:
         self.mar = 0    # Memory Address Register, holds the memory address we're reading or writing
         self.mdr = 0    # Memory Data Register, holds the value to write or the value just read
         self.fl = 0     # Flags, see below
+
+        self.branch_table = {}
+        self.branch_table[instructions['HLT']] = self.hlt
+        self.branch_table[instructions['LDI']] = self.ldi
+        self.branch_table[instructions['PRN']] = self.prn
+        self.branch_table[instructions['MUL']] = self.mul
 
     # Register getter methods
     @property
@@ -95,6 +101,7 @@ class CPU:
         try:
             filename = sys.argv[1] # This will throw if there is no second argument
             # filename = "examples/mult.ls8"
+            # filename = "examples/print8.ls8"
 
             file = open(filename, "r")
             for line in file:
@@ -162,24 +169,14 @@ class CPU:
         """Run the CPU."""
         while True:
             # Read the memory address that's stored in register PC, and store that result in the Instruction Register.
-            self.ir = self.pc
-
-            cmd = instructions[self.ram_read(self.pc) & 0x3F]
-
-            if cmd == 'HLT':
-                return 
-            elif cmd == 'LDI':
-                self.ldi()
-            elif cmd == 'PRN':
-                self.prn()
-            elif cmd == 'MUL':
-                self.mul()
-            else:
-                print(f"Unsupported instruction: {cmd}")
-                return 
+            self.ir = self.ram_read(self.pc) & 0x3F
+            self.branch_table[self.ir]()
 
             # Advance PC by the highest two order bits
             self.pc = self.pc + (self.ram_read(self.pc) >> 6) + 1
+
+    def hlt(self):
+        sys.exit()
 
     def ldi(self):
         self.registers[self.ram_read(self.pc + 1) & 0x07] = self.ram_read(self.pc + 2)
