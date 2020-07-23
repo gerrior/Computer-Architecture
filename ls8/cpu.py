@@ -86,18 +86,43 @@ class CPU:
 
         address = 0
 
-        # For now, we've just hardcoded a program:
+        # Load the program from file
+        file = None # If open fails, compiler will complain "local variable 'file' referenced before assignment"
+        filename = None # And if second argument is missing
+        program = []
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        try:
+            filename = sys.argv[1] # This will throw if there is no second argument
+            #filename = "examples/empty.ls8"
 
+            file = open(filename, "r")
+            for line in file:
+                line = line.split("#", 1) # Find comments
+                line = line[0].strip() # Take non-comment portion and trim spaces
+                if len(line) == 0: # If there is nothing left...
+                    continue 
+
+                byte = int(line, 2)
+                program.append(byte)
+
+            if len(program) == 0:
+                raise EOFError
+
+        except EOFError:
+            print(f"{filename} did not contain a program")
+            sys.exit()
+        except:
+            if len(filename) == 0:
+                print("Second argument must be filename: python3 ls8.py examples/print.ls8")
+            else:
+                print(f"Unable to open filename {filename}")
+            sys.exit()
+
+        finally:
+            if file is not None:
+                file.close()
+
+        # Load the program into RAM
         for instruction in program:
             self.ram[address] = instruction
             address += 1
