@@ -9,6 +9,9 @@ instructions = {
     'PUSH': 0b00000101,
     'POP':  0b00000110,
     'PRN':  0b00000111,
+    'CALL': 0b00010000,
+    'RET':  0b00010001,
+    'ADD':  0b00100000,
     'MUL':  0b00100010
 }
 
@@ -34,6 +37,9 @@ class CPU:
         self.branch_table[instructions['PUSH']] = self.push
         self.branch_table[instructions['POP' ]] = self.pop
         self.branch_table[instructions['PRN' ]] = self.prn
+        self.branch_table[instructions['CALL']] = self.call
+        self.branch_table[instructions['RET' ]] = self.ret
+        self.branch_table[instructions['ADD' ]] = self.add
         self.branch_table[instructions['MUL' ]] = self.mul
 
     # Register getter methods
@@ -109,6 +115,7 @@ class CPU:
             # filename = "examples/mult.ls8"
             # filename = "examples/print8.ls8"
             # filename = "examples/stack.ls8"
+            # filename = "examples/call.ls8"
 
             file = open(filename, "r")
             for line in file:
@@ -147,7 +154,7 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
+            self.registers[reg_a] += self.registers[reg_b]
         #elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
@@ -180,7 +187,8 @@ class CPU:
             self.branch_table[self.ir]()
 
             # Advance PC by the highest two order bits
-            self.pc = self.pc + (self.ram_read(self.pc) >> 6) + 1
+            if self.ir != instructions['CALL'] and self.ir != instructions['RET']:
+                self.pc = self.pc + (self.ram_read(self.pc) >> 6) + 1
 
     def hlt(self):
         sys.exit()
@@ -220,6 +228,37 @@ class CPU:
         print(self.registers[self.ram_read(self.pc + 1) & 0x07])
         return 
         
+    def call(self):
+        # Get address of the next instruction
+        return_addr = self.pc + 2
+
+        # Push that on the stack
+        self.sp -= 1
+        address_to_push_to = self.sp
+        self.ram_write(address_to_push_to, return_addr)
+
+        # Set the PC to the subroutine address
+        reg_num = self.ram_read(self.pc + 1)
+        subroutine_addr = self.registers[reg_num]
+
+        self.pc = subroutine_addr
+
+    def ret(self):
+        # Get return address from the top of the stack
+        address_to_pop_from = self.sp
+        return_addr = self.ram_read(address_to_pop_from)
+        self.sp += 1
+
+        # Set the PC to the return address
+        self.pc = return_addr
+
+    def add(self):
+        reg_a = self.ram_read(self.pc + 1)
+        reg_b = self.ram_read(self.pc + 2)
+
+        self.alu('ADD', reg_a, reg_b)
+        return
+
     def mul(self):
         self.r0 = self.r0 * self.r1
         return
